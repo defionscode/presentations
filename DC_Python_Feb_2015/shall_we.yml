@@ -1,0 +1,8 @@
+---
+- name: Magic 8 Ball Module
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Executing our custom module here
+      magic_8ball:
+        question: Shall this playbook continue?
