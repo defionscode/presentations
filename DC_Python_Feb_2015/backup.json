@@ -1,0 +1,20 @@
+[{
+  "magic": {
+    "answer": "All signs point to NO",
+    "type": "Negative"
+  }
+},
+{
+  "magic": {
+    "answer": "Yes – definitely",
+    "type": "Affirmative"
+  }
+},
+{
+  "magic": {
+    "answer": "Unsure",
+    "type": "Neutral"
+  }
+}
+
+]
