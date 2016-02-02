@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-import urllib2, json, os, random
-
-API='https://8ball.delegator.com/magic/JSON/'
-
+import random
 
 def get_answers(question):
     try:
-        r = urllib2.urlopen(url=API + question, timeout=1)
+        API = 'https://8ball.delegator.com/magic/JSON/%s' % question
+        r = open_url(API, http_agent='ansible') 
         data = json.loads(r.read())
+    # Just in case the API is down, we'll open a local file with a json structure
     except urllib2.URLError:
         path = os.getcwd()
         r = urllib2.urlopen(url="file://%s/backup.json" % path)
         data = random.choice(json.loads(r.read()))
+
     finally:
         answer = data['magic']['answer']
         answer_type = data ['magic']['type']
@@ -37,5 +37,6 @@ def main():
 
 
 from ansible.module_utils.basic import *
+from ansible.module_utils.urls import * 
 if __name__ == '__main__':
     main()
