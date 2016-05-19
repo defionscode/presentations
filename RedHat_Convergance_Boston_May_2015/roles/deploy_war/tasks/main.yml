@@ -1,0 +1,11 @@
+- name: Download war
+  get_url:
+    url: https://tomcat.apache.org/tomcat-7.0-doc/appdev/sample/sample.war
+    validate_certs: no
+    dest: /tmp/sample.war
+
+- name: Deploy war
+  jboss:
+    src: /tmp/sample.war
+    deploy_path: /usr/share/jboss-as-7.1.1.Final/standalone/deployments/
+    deployment: sample.war

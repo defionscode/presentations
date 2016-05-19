@@ -1,0 +1,14 @@
+---
+- name: Provision AWS Infra
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  roles:
+    - aws_infra
+
+- name: Configure and Setup Jboss App
+  hosts: managed_hosts
+  become: yes
+  roles:
+    - jboss_standalone
+    - deploy_war

@@ -1,0 +1,51 @@
+- name: ensure security group
+  ec2_group:
+    name: insecure_all
+    description: all ports open
+    region: "{{ aws_region }}"
+    vpc_id: "{{ vpc_id }}"
+    rules:
+      - proto: all
+        cidr_ip: 0.0.0.0/0
+    rules_egress:
+      - proto: all
+        cidr_ip: 0.0.0.0/0
+
+- name: Launch Instances 
+  ec2:
+    assign_public_ip: yes
+    keypair: "{{ aws_key }}"
+    group: insecure_all 
+    type: t2.medium 
+    image: "{{ ec2_image }}"
+    region: "{{ ec2_region | default('us-east-1') }}"
+    instance_tags: 
+      Name: JBOSS Deploy Demo - {{ event_name }}
+    count_tag: 
+      Name: JBOSS Deploy Demo - {{ event_name }}
+    exact_count: "{{ count | default(1) }}"
+    vpc_subnet_id: "{{ subnet_id }}"
+    wait: yes
+    volumes:
+      - device_name: /dev/sda1
+        volume_type: gp2
+        volume_size: 20 
+        delete_on_termination: true
+  register: ec2_results
+
+- name: Wait for SSH to come up
+  wait_for:
+    host: "{{ ec2_results.tagged_instances[0].public_dns_name }}"
+    port: 22 
+    timeout: 500 
+    state: started
+
+- debug: var=ec2_results
+
+- name: add hosts
+  add_host:
+    name: "{{ ec2_results.tagged_instances[0].tags.Name }}"
+    ansible_host: "{{ ec2_results.tagged_instances[0].public_ip }}"
+    ansible_user: ec2-user 
+    groups: managed_hosts
+  changed_when: no

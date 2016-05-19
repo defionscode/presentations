@@ -1,0 +1,70 @@
+---
+- name: Make jboss home
+  file:
+    path: /usr/share/jboss-as-7.1.1.Final
+    state: directory
+
+- name: Add group "jboss"
+  group: 
+    name: jboss
+
+- name: Add user "jboss"
+  user: 
+    name: jboss 
+    group: jboss 
+    home: /usr/share/jboss-as-7.1.1.Final
+
+- name: Make jboss home
+  file:
+    path: /usr/share/jboss-as-7.1.1.Final
+    state: directory
+    owner: jboss
+    group: jboss
+
+- name: Install Java 1.7 and unzip 
+  yum: 
+    name: "{{item}}" 
+    state: present
+  with_items:
+   - unzip
+   - java-1.7.0-openjdk
+
+- name: Download JBoss from jboss.org
+  get_url: 
+    url: http://download.jboss.org/jbossas/7.1/jboss-as-7.1.1.Final/jboss-as-7.1.1.Final.zip i
+    dest: /opt/jboss-as-7.1.1.Final.zip 
+
+- name: Extract archive
+  unarchive: 
+    dest: /usr/share/
+    src: /opt/jboss-as-7.1.1.Final.zip
+    creates: /usr/share/jboss-as-7.1.1.Final
+    copy: no
+    owner: jboss
+    group: jboss
+
+- name: Copying standalone.xml configuration file
+  template: 
+    src: standalone.xml.j2 
+    dest: /usr/share/jboss-as-7.1.1.Final/standalone/configuration/standalone.xml
+    owner: jboss
+    group: jboss
+  notify: restart jboss
+
+- name: Copy the init script
+  copy:
+    src: jboss-as-standalone.sh 
+    dest: /etc/init.d/jboss 
+    mode: 0755
+
+- name: Enable JBoss to be started at boot
+  service: 
+    name: jboss 
+    enabled: yes 
+    state: started 
+
+- name: deploy iptables rules
+  template: 
+    src: iptables-save.j2 
+    dest: /etc/sysconfig/iptables
+  notify: restart iptables
