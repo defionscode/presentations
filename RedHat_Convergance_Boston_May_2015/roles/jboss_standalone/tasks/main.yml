@@ -38,7 +38,7 @@
   unarchive: 
     dest: /usr/share/
     src: /opt/jboss-as-7.1.1.Final.zip
-    creates: /usr/share/jboss-as-7.1.1.Final
+    creates: /usr/share/jboss-as-7.1.1.Final/standalone
     copy: no
     owner: jboss
     group: jboss
